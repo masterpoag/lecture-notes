@@ -1,7 +1,7 @@
-Looking_for= ["test","test12"]
+Looking_for= []
 
 import os,re
-
+importance = 10
 def update_search():
     global Looking_for
     while True:
@@ -19,17 +19,19 @@ def removeSearch():
         for i in range(0,len(Looking_for)):
             print(f"{i+1}) {Looking_for[i]}")
         user = input("")
+        
         try:
-            if int(user.strip(),10) <= len(Looking_for) and not 0 and not -1:
+            if int(user.strip(),10) <= len(Looking_for):
+                if int(user.strip(),10) == 0:
+                    return
+                if int(user.strip(),10) == -1:
+                    Looking_for= []
+                    return
                 Looking_for.pop(int(user.strip(),10)-1)
-            elif int(user.strip(),10) == 0:
-                return
-            elif int(user.strip(),10) == -1:
-                Looking_for= []
             else:
                 print("make sure to pick a option. (press enter to close)")
                 input("")
-            
+                
         except:
             print("make sure to type a number. (press enter to close)")
             input("")
@@ -37,8 +39,11 @@ def removeSearch():
 
 def initialization():
     global count, total
-    with open("config.cfg") as file:
-        FOLDER_LOC = file.read()
+    try:
+        FOLDER_LOC = open("config.cfg").read()
+    except:
+        f = open("config.cfg", "w")
+        f.write("notes/")
     count = 0
     total = 0
     countDict = {}
@@ -53,7 +58,7 @@ def initialization():
     for i in FOLDER_CONTENT:
         index = FOLDER_CONTENT.index(i)
         FOLDER_CONTENT[index] = FOLDER_LOC+i
-    search(FOLDER_CONTENT,countDict)
+    search(FOLDER_CONTENT,countDict,f)
 
 def counter(s,t):
     counter = 0
@@ -64,22 +69,21 @@ def counter(s,t):
 
 def ChangeFolder():
     f = open("config.cfg","w")
-    f.write("Folder_LOC =",input("Where is the folder located?\n").strip())
+    f.write("Folder_LOC =",input("Where is the folder located? default: notes/\n").strip())
 
 
 
 def txtWriter(line,countDict,note,f):
-    global count,Looking_for,total
+    global count,Looking_for,total,importance
     pattern = r'\b\d+:\d+\b'
     important = 0
     fixedWriting = re.sub(pattern,'',line).replace("\n","")
     fixedLine = fixedWriting.replace("U.S.","United States").replace(".",".\n").replace("?","?\n")
-    
     for i in fixedLine.split("\n"):
         for n in Looking_for:
             if n.lower() in i.lower():
                 countDict[n] += 1
-                important = 10
+                important = importance
                 continue
         if counter(i," ") >= 3:
             if important != 0:
@@ -92,10 +96,60 @@ def txtWriter(line,countDict,note,f):
     total += count
     count = 0
 
-def search(FOLDER_CONTENT,dict):
+def search(FOLDER_CONTENT,dict,f):
     for note in FOLDER_CONTENT:
         with open(note) as file:
-            txtWriter(file.read(),dict,file)
+            txtWriter(file.read(),dict,note,f)
 
-removeSearch()
+def fileTest(FOLDER_CONTENT):
+    print(FOLDER_CONTENT)
+
+def set_importance():
+    global importance
+    try:
+        user = input("pick a number as importance factor. (number of lines added on top of the line with the keywords) default: 10\n")
+        importance = int(user.strip(),10)
+    except:
+        print("make sure to pick a option. (press enter to close)")
+        input("")
+        set_importance()
+
+
 #TODO Add user interface
+def UI():
+    os.system('cls||clear')
+    print(
+"""Welcome to the Note Searcher. Ctrl+C to close
+0) run search
+1) set search
+2) remove search
+3) set notes location
+4) set importance factor""")
+    try:
+        s = int(input("").strip(),10)
+    except:
+        print("make sure to type a number. (press enter to close)")
+        input("")
+        UI()
+    os.system('cls||clear')
+    match s:
+        case 0:
+            initialization()
+            UI()
+        case 1:
+            update_search()
+            UI()
+        case 2:
+            removeSearch()
+            UI()
+        case 3:
+            ChangeFolder()
+            UI()
+        case 4:
+            set_importance()
+            UI()
+        case _:
+            print("make sure to pick a option. (press enter to close)")
+            input("")
+            UI()
+UI()
