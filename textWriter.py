@@ -21,7 +21,7 @@ def removeSearch():
         user = input("")
         
         try:
-            if int(user.strip(),10) <= len(Looking_for):
+            if int(user.strip(),10) <= len(Looking_for) <= 0:
                 if int(user.strip(),10) == 0:
                     return
                 if int(user.strip(),10) == -1:
@@ -68,8 +68,8 @@ def counter(s,t):
     return counter
 
 def ChangeFolder():
-    f = open("config.cfg","w")
-    f.write("Folder_LOC =",input("Where is the folder located? default: notes/\n").strip())
+    temp= str(input(f"Where is the folder located? Set to: {open("config.cfg","r").read()}\n").strip()+"/")
+    open("config.cfg","w").write(temp)
 
 
 
@@ -115,7 +115,6 @@ def set_importance():
         set_importance()
 
 
-#TODO Add user interface
 def UI():
     os.system('cls||clear')
     print(
@@ -125,31 +124,33 @@ def UI():
 2) remove search
 3) set notes location
 4) set importance factor""")
+    u = input("")
     try:
-        s = int(input("").strip(),10)
+        s = int(u.strip(),10)
     except:
         print("make sure to type a number. (press enter to close)")
         input("")
-        UI()
+        return
     os.system('cls||clear')
     match s:
         case 0:
             initialization()
-            UI()
+            return
         case 1:
             update_search()
-            UI()
+            return
         case 2:
             removeSearch()
-            UI()
+            return
         case 3:
             ChangeFolder()
-            UI()
+            return
         case 4:
             set_importance()
-            UI()
+            return
         case _:
             print("make sure to pick a option. (press enter to close)")
             input("")
-            UI()
-UI()
+            return
+while True:
+    UI()
