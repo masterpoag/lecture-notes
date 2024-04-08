@@ -21,7 +21,7 @@ def removeSearch():
         user = input("")
         
         try:
-            if int(user.strip(),10) <= len(Looking_for) <= 0:
+            if int(user.strip(),10) <= len(Looking_for):
                 if int(user.strip(),10) == 0:
                     return
                 if int(user.strip(),10) == -1:
